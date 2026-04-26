@@ -1,0 +1,52 @@
+FROM node:20-bookworm
+
+WORKDIR /app
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PNPM_HOME="/pnpm"
+ENV CARGO_HOME="/root/.cargo"
+ENV RUSTUP_HOME="/root/.rustup"
+ENV PATH="/root/.local/bin:/root/.cargo/bin:$PNPM_HOME:$PATH"
+ENV DISPLAY=":99"
+ENV LIBGL_ALWAYS_SOFTWARE="1"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  curl \
+  git \
+  file \
+  pkg-config \
+  build-essential \
+  libssl-dev \
+  libwebkit2gtk-4.1-dev \
+  libxdo-dev \
+  libayatana-appindicator3-dev \
+  librsvg2-dev \
+  libsoup-3.0-dev \
+  patchelf \
+  xvfb \
+  x11vnc \
+  fluxbox \
+  xauth \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+RUN npm i -g @openai/codex@latest
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches ./patches
+COPY mcp-server/package.json ./mcp-server/package.json
+
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+COPY docker/tauri-entrypoint.sh /usr/local/bin/tauri-entrypoint.sh
+RUN chmod +x /usr/local/bin/tauri-entrypoint.sh
+
+EXPOSE 5202
+EXPOSE 5900
+
+CMD ["/usr/local/bin/tauri-entrypoint.sh"]

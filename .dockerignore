@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+coverage
+test-results
+playwright-report
+src-tauri/target
+*.log

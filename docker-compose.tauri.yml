@@ -1,0 +1,13 @@
+services:
+  tolaria:
+    build:
+      context: .
+      dockerfile: Dockerfile.tauri
+    image: tolaria:tauri-local
+    ports:
+      - "5202:5202"
+      - "5900:5900"
+    environment:
+      - NODE_ENV=development
+      - MCP_WS_PORT=9710
+      - DISPLAY=:99

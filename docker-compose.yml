@@ -1,0 +1,11 @@
+services:
+  tolaria:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tolaria:local
+    ports:
+      - "5202:5202"
+    environment:
+      - NODE_ENV=production
+      - MCP_WS_PORT=9710
